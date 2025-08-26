@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Markdown from "react-native-markdown-display";
+import Recipe from "./Recipe";
 
 export default function ScrapResults({ data }: { data: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -42,6 +43,8 @@ export default function ScrapResults({ data }: { data: string }) {
     );
   }
 
+  const handleCloseRecipe = () => setExpanded(false);
+
   return (
     <>
       <View style={styles.actions}>
@@ -60,24 +63,7 @@ export default function ScrapResults({ data }: { data: string }) {
       <ScrollView style={styles.card}>
         <Markdown style={markdownStyles}>{data}</Markdown>
       </ScrollView>
-      <Modal
-        visible={expanded}
-        animationType="slide"
-        onRequestClose={() => setExpanded(false)}
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setExpanded(false)}>
-              <Feather name="x" size={28} color="#ed4f27ff" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Receita Completa</Text>
-            <View style={{ width: 28 }} /> {/* Espaço para alinhar o título */}
-          </View>
-          <ScrollView style={styles.modalContent}>
-            <Markdown style={markdownStyles}>{data}</Markdown>
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+      <Recipe visible={expanded} onClose={handleCloseRecipe} data={data} />
     </>
   );
 }

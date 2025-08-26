@@ -1,3 +1,5 @@
+import Header from "@/components/Header";
+import RecipesList from "@/components/RecipesList";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -8,7 +10,7 @@ export default function Book() {
 
   const getRecipes = async () => {
     try {
-      const recipes = await fetch("http://localhost:8000/recipes", {
+      const recipes = await fetch("http://localhost:8000/saved_recipes", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -26,19 +28,17 @@ export default function Book() {
   }, []);
 
   return (
-    <View
-      style={{
-        padding: 20,
-        flex: 1,
-        // justifyContent: "center",
-        // alignItems: "center",
-      }}
-    >
-      <Text>Recipes Book</Text>
+    <View>
+      <Header />
+      {/* <Text>Recipes Book</Text>
       <Text>Here you can save your favorite recipes.</Text>
       {recipes.length > 0 ? (
         recipes.map((recipe, index) => (
           <ScrollView key={index} style={{ maxHeight: 200, marginBottom: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
+              {recipe.title || "Untitled Recipe"}
+            </Text>
+            <Markdown></Markdown>
             <Markdown style={markdownStyles} key={index}>
               {recipe.content}
             </Markdown>
@@ -49,7 +49,8 @@ export default function Book() {
       )}
       <Text style={{ fontSize: 16, color: "gray", marginTop: 10 }}>
         More features coming soon!
-      </Text>
+      </Text> */}
+      <RecipesList />
     </View>
   );
 }
