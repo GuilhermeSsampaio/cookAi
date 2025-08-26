@@ -46,8 +46,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     outlineWidth: 0, // <-- Adicione esta linha para web
-    outline: "none", // <-- E esta linha também
-    // outlineStyle is not supported in React Native
   },
   iconButton: {
     marginLeft: 8,

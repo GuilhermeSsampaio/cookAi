@@ -24,12 +24,13 @@ export default function Header() {
         <Text style={styles.title}>CookAi</Text>
         <Text style={styles.text}>Bem vindo ao CookAi!</Text>
         <Text style={styles.text}>
-          Salve suas receitas e se livre de anuncios
+          Salve suas receitas e se livre de anuncios!
         </Text>
+        {/* 
         <Text style={styles.text}>
           Não perca tempo, copie o link da receita e cole aqui
         </Text>
-        <Text style={styles.text}>E a mágica acontece!</Text>
+        <Text style={styles.text}>E a mágica acontece!</Text> */}
       </LinearGradient>
       <ProfileDrawer
         visible={drawerVisible}
@@ -44,8 +45,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingTop: 48,
-    paddingBottom: 32,
+    paddingTop: 20,
+    paddingBottom: 22,
     position: "relative",
   },
   profileBtn: {

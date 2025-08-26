@@ -4,30 +4,33 @@ import ScrapResults from "@/components/ScrapResults";
 import { useState } from "react";
 import { Text } from "react-native";
 
+// const BASE_URL =process.env.EXPO_PUBLIC_API_URL || "https://cookaiapiv2-8eb4v0cu.b4a.run";
+const BASE_URL = "http://localhost:8000";
+
 export default function Index() {
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleScrap = async (link: string) => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch(
-        "https://api-receitas-pi.vercel.app/receitas/todas"
+        `${BASE_URL}/scrap?url=${encodeURIComponent(link)}`,
+        {
+          method: "POST",
+        }
       );
       const json = await res.json();
-      // Mapeia os dados para o formato esperado pelo ScrapResults
-      const data = (json.items || []).map((item: any) => ({
-        id: item.id,
-        titulo: item.receita,
-        ingredientes:
-          item.IngredientesBase?.[0]?.nomesIngrediente ||
-          item.ingredientes.split(",").map((i: string) => i.trim()),
-        preparo: item.modo_preparo,
-        imagem: item.link_imagem,
-      }));
-      setResults(data);
+      if (json) {
+        setResults(json);
+      } else {
+        setResults("Nenhum dado encontrado.");
+      }
     } catch (e) {
-      setResults([]);
+      setError("Ocorreu um erro ao buscar os dados." + e);
+      setResults("");
     }
     setLoading(false);
   };
@@ -40,8 +43,12 @@ export default function Index() {
         <Text style={{ textAlign: "center", marginTop: 32 }}>
           Carregando...
         </Text>
+      ) : error ? (
+        <Text style={{ textAlign: "center", marginTop: 32, color: "red" }}>
+          {error}
+        </Text>
       ) : (
-        <ScrapResults data={results} />
+        <ScrapResults data={results || ""} />
       )}
     </>
   );

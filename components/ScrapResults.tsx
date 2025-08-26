@@ -1,81 +1,146 @@
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { useState } from "react";
+import {
+  Modal,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import Markdown from "react-native-markdown-display";
 
-type Recipe = {
-  id: number;
-  titulo: string;
-  ingredientes: string[];
-  preparo: string;
-  imagem: string;
-};
+export default function ScrapResults({ data }: { data: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [savedRecipes, setSavedRecipes] = useState<string[]>([]);
 
-export default function ScrapResults({ data }: { data: Recipe[] }) {
-  if (!data.length) {
+  const handleSave = async () => {
+    const res = await fetch("http://localhost:8000/save_recipe", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ recipe: data }),
+    });
+    if (!res.ok) {
+      console.error("Failed to save recipe", await res.text());
+      return;
+    } else {
+      console.log("Recipe saved successfully", res);
+    }
+    if (data && !savedRecipes.includes(data)) {
+      setSavedRecipes([...savedRecipes, data]);
+    }
+  };
+
+  if (!data) {
     return (
       <View style={styles.empty}>
-        <Text style={styles.emptyText}>Nenhuma receita encontrada.</Text>
+        <Markdown style={markdownStyles}>Nenhuma receita encontrada.</Markdown>
       </View>
     );
   }
 
   return (
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.card}>
-          {item.imagem ? (
-            <Image source={{ uri: item.imagem }} style={styles.image} />
-          ) : null}
-          <Text style={styles.title}>{item.titulo}</Text>
-          <Text style={styles.subtitle}>Ingredientes:</Text>
-          <Text style={styles.body}>{item.ingredientes.join(", ")}</Text>
-          <Text style={styles.subtitle}>Preparo:</Text>
-          <Text style={styles.body}>{item.preparo}</Text>
-        </View>
-      )}
-      contentContainerStyle={styles.list}
-    />
+    <>
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={() => setExpanded(true)}
+        >
+          <Feather name="maximize" size={20} color="#ed4f27ff" />
+          <Text style={styles.actionText}>Expandir</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionBtn} onPress={handleSave}>
+          <Feather name="bookmark" size={20} color="#ed4f27ff" />
+          <Text style={styles.actionText}>Salvar</Text>
+        </TouchableOpacity>
+      </View>
+      <ScrollView style={styles.card}>
+        <Markdown style={markdownStyles}>{data}</Markdown>
+      </ScrollView>
+      <Modal
+        visible={expanded}
+        animationType="slide"
+        onRequestClose={() => setExpanded(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setExpanded(false)}>
+              <Feather name="x" size={28} color="#ed4f27ff" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Receita Completa</Text>
+            <View style={{ width: 28 }} /> {/* Espaço para alinhar o título */}
+          </View>
+          <ScrollView style={styles.modalContent}>
+            <Markdown style={markdownStyles}>{data}</Markdown>
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  list: {
-    padding: 16,
-  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    margin: 16,
     elevation: 2,
   },
-  image: {
-    width: "100%",
-    height: 160,
-    borderRadius: 8,
-    marginBottom: 8,
-    resizeMode: "cover",
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 18,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontWeight: "bold",
+  actions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginHorizontal: 16,
     marginTop: 8,
-    marginBottom: 2,
-    color: "#43e97b",
+    gap: 12,
   },
-  body: {
-    color: "#444",
-    fontSize: 14,
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f6a26133",
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    marginLeft: 8,
+  },
+  actionText: {
+    marginLeft: 6,
+    color: "#ed4f27ff",
+    fontWeight: "bold",
+    fontSize: 15,
   },
   empty: {
     padding: 32,
     alignItems: "center",
   },
-  emptyText: {
-    color: "#888",
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#ed4f27ff",
+  },
+  modalContent: {
+    flex: 1,
+    padding: 16,
   },
 });
+
+const markdownStyles = {
+  body: { color: "#444", fontSize: 15 },
+  heading2: { color: "#ed4f27ff", fontSize: 20, marginTop: 12 },
+  strong: { fontWeight: "bold", color: "#ed4f27ff" },
+};

@@ -1,22 +1,61 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import Markdown from "react-native-markdown-display";
 
-export default function book() {
+export default function Book() {
+  const [recipes, setRecipes] = useState([]);
+
+  const getRecipes = async () => {
+    try {
+      const recipes = await fetch("http://localhost:8000/recipes", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((res) => res.json());
+      setRecipes(recipes);
+      console.log("Fetched recipes:", recipes);
+    } catch (error) {
+      console.error("Failed to fetch recipes", error);
+    }
+  };
+
+  useEffect(() => {
+    getRecipes();
+  }, []);
+
   return (
     <View
       style={{
         padding: 20,
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        // justifyContent: "center",
+        // alignItems: "center",
       }}
     >
       <Text>Recipes Book</Text>
       <Text>Here you can save your favorite recipes.</Text>
-      {/* You can add more functionality here, like a list of saved recipes */}
+      {recipes.length > 0 ? (
+        recipes.map((recipe, index) => (
+          <ScrollView key={index} style={{ maxHeight: 200, marginBottom: 20 }}>
+            <Markdown style={markdownStyles} key={index}>
+              {recipe.content}
+            </Markdown>
+          </ScrollView>
+        ))
+      ) : (
+        <Text>Nenhuma receita encontrada</Text>
+      )}
       <Text style={{ fontSize: 16, color: "gray", marginTop: 10 }}>
         More features coming soon!
       </Text>
     </View>
   );
 }
+
+const markdownStyles = {
+  body: { color: "#444", fontSize: 15 },
+  heading2: { color: "#ed4f27ff", fontSize: 20, marginTop: 12 },
+  strong: { fontWeight: "bold", color: "#ed4f27ff" },
+};
