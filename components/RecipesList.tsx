@@ -7,17 +7,20 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Recipe from "./Recipe";
+import { useApi } from "@/hooks/useApi";
 
 export default function RecipesList() {
   const [data, setData] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const useApiHook = useApi();
 
   const get_recipes = async () => {
     try {
-      const response = await fetch("http://localhost:8000/saved_recipes");
-      const json = await response.json();
-      setData(json);
+      const response = await useApiHook.getSavedRecipes();
+      // const json = await response.json();
+      // setData(json);
+      setData(response);
     } catch (e) {
       console.error("Failed to fetch recipes", e);
       setData([]);

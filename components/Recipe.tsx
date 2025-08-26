@@ -12,7 +12,6 @@ import Markdown from "react-native-markdown-display";
 import { Feather } from "@expo/vector-icons";
 
 export default function Recipe({ visible, onClose, data }) {
-  console.log("Recipe data:", data);
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.modalContainer}>

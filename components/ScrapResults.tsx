@@ -1,39 +1,27 @@
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-  Modal,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Markdown from "react-native-markdown-display";
 import Recipe from "./Recipe";
+import { useApi } from "@/hooks/useApi";
 
 export default function ScrapResults({ data }: { data: string }) {
   const [expanded, setExpanded] = useState(false);
   const [savedRecipes, setSavedRecipes] = useState<string[]>([]);
+  const useApiHooks = useApi();
 
   const handleSave = async () => {
-    const res = await fetch("http://localhost:8000/save_recipe", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ recipe: data }),
-    });
-    if (!res.ok) {
-      console.error("Failed to save recipe", await res.text());
-      return;
-    } else {
-      console.log("Recipe saved successfully", res);
-    }
-    if (data && !savedRecipes.includes(data)) {
+    try {
+      const res = await useApiHooks.saveRecipe({ recipe: data });
       setSavedRecipes([...savedRecipes, data]);
+      console.log("Recipe saved successfully", res);
+    } catch (e) {
+      console.error("Failed to save recipe", e);
     }
   };
+
+  const handleCloseRecipe = () => setExpanded(false);
 
   if (!data) {
     return (
@@ -42,8 +30,6 @@ export default function ScrapResults({ data }: { data: string }) {
       </View>
     );
   }
-
-  const handleCloseRecipe = () => setExpanded(false);
 
   return (
     <>
