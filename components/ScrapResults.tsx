@@ -5,6 +5,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import Markdown from "react-native-markdown-display";
 import Recipe from "./Recipe";
 import { useApi } from "@/hooks/useApi";
+import Toast from "react-native-toast-message";
 
 export default function ScrapResults({ data }: { data: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -15,9 +16,21 @@ export default function ScrapResults({ data }: { data: string }) {
     try {
       const res = await useApiHooks.saveRecipe({ recipe: data });
       setSavedRecipes([...savedRecipes, data]);
+      Toast.show({
+        type: "success",
+        text1: "Receita salva com sucesso!",
+        position: "top",
+        visibilityTime: 3000,
+      });
       console.log("Recipe saved successfully", res);
     } catch (e) {
       console.error("Failed to save recipe", e);
+      Toast.show({
+        type: "error",
+        text1: "Não foi possível salvar a receita!",
+        position: "top",
+        visibilityTime: 3000,
+      });
     }
   };
 

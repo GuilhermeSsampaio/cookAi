@@ -23,7 +23,7 @@ export default function Book() {
   }, []);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <Header />
       <Text
         style={{
