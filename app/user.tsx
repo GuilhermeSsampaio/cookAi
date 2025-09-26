@@ -1,6 +1,19 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import { useApi } from "@/hooks/useApi";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function UserScreen() {
+  // const { logoutUser } = useApi();
+  const { logoutContext } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    // await logoutUser(); // Remove os dados do AsyncStorage
+    await logoutContext(); // Atualiza o estado de autenticação
+    router.replace("/login"); // Redireciona para a tela de login
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -14,6 +27,11 @@ export default function UserScreen() {
         Apaixonado por culinária e tecnologia. Adora testar novas receitas e
         compartilhar conhecimento!
       </Text>
+
+      {/* Botão de Logout */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Sair</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -52,5 +70,17 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: "left",
     alignSelf: "flex-start",
+  },
+  logoutButton: {
+    marginTop: 32,
+    backgroundColor: "#ed4f27ff",
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+  },
+  logoutButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

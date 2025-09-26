@@ -5,30 +5,12 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Recipe from "./Recipe";
-import { useApi } from "@/hooks/useApi";
 
-export default function RecipesList() {
-  const [data, setData] = useState([]);
+export default function RecipesList({ recipes }) {
   const [expanded, setExpanded] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const useApiHook = useApi();
-
-  const get_recipes = async () => {
-    try {
-      const response = await useApiHook.getSavedRecipes();
-      // const json = await response.json();
-      // setData(json);
-      setData(response);
-    } catch (e) {
-      console.error("Failed to fetch recipes", e);
-      setData([]);
-    }
-  };
-  useEffect(() => {
-    get_recipes();
-  }, []);
 
   const handleCloseRecipe = () => {
     setExpanded(false);
@@ -54,7 +36,7 @@ export default function RecipesList() {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        data={data}
+        data={recipes}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}

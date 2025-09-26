@@ -6,15 +6,27 @@ import Markdown from "react-native-markdown-display";
 import Recipe from "./Recipe";
 import { useApi } from "@/hooks/useApi";
 import Toast from "react-native-toast-message";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "expo-router";
+
+import ModalLogin from "@/components/ModalLogin";
 
 export default function ScrapResults({ data }: { data: string }) {
   const [expanded, setExpanded] = useState(false);
   const [savedRecipes, setSavedRecipes] = useState<string[]>([]);
   const useApiHooks = useApi();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
 
   const handleSave = async () => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
     try {
-      const res = await useApiHooks.saveRecipe({ recipe: data });
+      const userId = await useApiHooks.getUserData();
+      const res = await useApiHooks.saveRecipe(userId, { recipe: data });
       setSavedRecipes([...savedRecipes, data]);
       Toast.show({
         type: "success",
@@ -35,6 +47,15 @@ export default function ScrapResults({ data }: { data: string }) {
   };
 
   const handleCloseRecipe = () => setExpanded(false);
+
+  const handleLogin = () => {
+    setShowLoginModal(false); // Fecha o modal
+    router.push("/login"); // Redireciona para a tela de login
+  };
+
+  const handleCancel = () => {
+    setShowLoginModal(false); // Fecha o modal
+  };
 
   if (!data) {
     return (
@@ -63,6 +84,12 @@ export default function ScrapResults({ data }: { data: string }) {
         <Markdown style={markdownStyles}>{data}</Markdown>
       </ScrollView>
       <Recipe visible={expanded} onClose={handleCloseRecipe} data={data} />
+      {/* Modal de Login */}
+      <ModalLogin
+        visible={showLoginModal}
+        onLogin={handleLogin}
+        onCancel={handleCancel}
+      />
     </>
   );
 }
