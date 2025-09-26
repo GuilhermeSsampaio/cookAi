@@ -9,11 +9,13 @@ import {
   StyleSheet,
 } from "react-native";
 import { useApi } from "@/hooks/useApi";
+import Recipe from "@/components/Recipe"; // Importa o componente Recipe
 
 export default function Search() {
   const [query, setQuery] = useState(""); // Entrada do usuário
   const [loading, setLoading] = useState(false); // Indicador de carregamento
   const [results, setResults] = useState([]); // Resultados da busca
+  const [selectedRecipe, setSelectedRecipe] = useState(null); // Receita selecionada
   const useApiHook = useApi();
 
   const handleSearch = async () => {
@@ -26,7 +28,14 @@ export default function Search() {
     try {
       // Chama a API para buscar receitas com base na entrada do usuário
       const response = await useApiHook.searchRecipes(query);
-      setResults(response.recipes || []);
+      console.log("Resposta da API:", response);
+
+      // Limpa a resposta para garantir que seja um JSON válido
+      const cleanedResponse = response.recipes
+        .replace(/```json|```/g, "")
+        .trim();
+      const recipes = JSON.parse(cleanedResponse); // Parseia a resposta JSON
+      setResults(recipes);
     } catch (error) {
       console.error("Erro ao buscar receitas:", error);
       alert("Não foi possível buscar receitas. Tente novamente mais tarde.");
@@ -34,6 +43,21 @@ export default function Search() {
       setLoading(false);
     }
   };
+
+  const renderRecipe = ({ item }) => (
+    <TouchableOpacity
+      onPress={() =>
+        setSelectedRecipe(`# ${item.title}\n\n${item.description}`)
+      }
+    >
+      <View style={styles.recipeCard}>
+        <Text style={styles.recipeTitle}>{item.title}</Text>
+        <Text style={styles.recipeDescription} numberOfLines={2}>
+          {item.description}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -51,38 +75,27 @@ export default function Search() {
 
       {loading && <ActivityIndicator size="large" color="#ed4f27ff" />}
 
-      {/* <FlatList
-        data={results.length > 0 ? results : [exampleRecipe]}
+      {!loading && results.length === 0 && (
+        <Text style={styles.emptyText}>Nenhuma receita encontrada.</Text>
+      )}
+
+      <FlatList
+        data={results}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.recipeCard}>
-            <Text style={styles.recipeTitle}>{item.title}</Text>
-            <Text style={styles.recipeDescription}>
-              {item.description || "Sem descrição disponível."}
-            </Text>
-          </View>
-        )} */}
-          <Text style={styles.recipeDescription}>
-              {{results}}
-            </Text>
-        ListEmptyComponent={
-          !loading && (
-            <Text style={styles.emptyText}>
-              Nenhuma receita encontrada. Tente outra busca.
-            </Text>
-          )
-        }
+        renderItem={renderRecipe}
+        contentContainerStyle={{ paddingBottom: 16 }}
       />
+
+      {selectedRecipe && (
+        <Recipe
+          visible={!!selectedRecipe}
+          onClose={() => setSelectedRecipe(null)}
+          data={selectedRecipe}
+        />
+      )}
     </View>
   );
 }
-
-// Exemplo de receita retornada pelo modelo
-const exampleRecipe = {
-  title: "Bolo de Fubá Sem Leite",
-  description:
-    "Um bolo de fubá delicioso e sem leite, perfeito para quem busca uma opção mais leve e saborosa. Confira a receita completa!",
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -118,12 +131,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  emptyText: {
+    fontSize: 16,
+    color: "#888",
+    textAlign: "center",
+    marginTop: 32,
+  },
   recipeCard: {
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#f6a26133",
+    backgroundColor: "#fff",
     borderRadius: 8,
-    marginBottom: 16,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 2,
   },
   recipeTitle: {
     fontSize: 18,
@@ -133,12 +152,6 @@ const styles = StyleSheet.create({
   recipeDescription: {
     fontSize: 14,
     color: "#666",
-    marginTop: 8,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: "#888",
-    textAlign: "center",
-    marginTop: 32,
+    marginTop: 4,
   },
 });
