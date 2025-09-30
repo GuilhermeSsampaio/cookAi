@@ -1,34 +1,32 @@
 import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function UserScreen() {
-  // const { logoutUser } = useApi();
-  const { logoutContext } = useAuth();
+  const { user, logoutContext } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
-    // await logoutUser(); // Remove os dados do AsyncStorage
-    await logoutContext(); // Atualiza o estado de autenticação
-    router.replace("/login"); // Redireciona para a tela de login
+    await logoutContext();
+    router.replace("/login");
   };
 
   return (
     <View style={styles.container}>
       <Image
-        source={{ uri: "https://randomuser.me/api/portraits/men/32.jpg" }}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/149/149071.png", // avatar blank
+        }}
         style={styles.avatar}
       />
-      <Text style={styles.name}>João da Silva</Text>
-      <Text style={styles.email}>joao@email.com</Text>
+      <Text style={styles.name}>{user?.username || "Usuário"}</Text>
+      <Text style={styles.email}>{user?.email || ""}</Text>
       <Text style={styles.label}>Sobre:</Text>
       <Text style={styles.about}>
         Apaixonado por culinária e tecnologia. Adora testar novas receitas e
         compartilhar conhecimento!
       </Text>
 
-      {/* Botão de Logout */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Sair</Text>
       </TouchableOpacity>
