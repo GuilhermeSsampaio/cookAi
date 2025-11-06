@@ -15,13 +15,13 @@ export default function LoginScreen() {
   const { loginContext } = useAuth();
 
   const [email, setEmail] = useState("");
-  const [password_hash, setPassword] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const useApiHook = useApi();
 
   const handleLogin = async () => {
-    if (!email || !password_hash) {
+    if (!email || !password) {
       Toast.show({
         type: "error",
         text1: "Erro",
@@ -34,7 +34,7 @@ export default function LoginScreen() {
     try {
       const response = await useApiHook.loginUser({
         email,
-        password_hash,
+        password,
       });
 
       // Salva o usuário no contexto
@@ -70,7 +70,7 @@ export default function LoginScreen() {
       <TextInput
         style={styles.input}
         placeholder="Senha"
-        value={password_hash}
+        value={password}
         onChangeText={setPassword}
         secureTextEntry
         placeholderTextColor="#656060ff"

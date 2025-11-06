@@ -21,9 +21,11 @@ export default function Book() {
       return;
     }
     try {
-      const userId = await useApiHook.getUserData();
+      const userData = await useApiHook.getUserData();
+      const userId = userData.id;
       const response = await useApiHook.getSavedRecipes(userId);
-      setRecipes(response.recipes || []);
+      console.log("getrecipes", response);
+      setRecipes(response || []);
       console.log("Fetched recipes:", response);
     } catch (error) {
       console.error("Failed to fetch recipes", error);

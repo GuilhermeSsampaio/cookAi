@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import Recipe from "./Recipe";
 
 export default function RecipesList({ recipes }) {
+  console.log(recipes);
   const [expanded, setExpanded] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 

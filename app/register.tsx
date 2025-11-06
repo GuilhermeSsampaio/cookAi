@@ -15,7 +15,7 @@ export default function RegisterScreen() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isPremium, setIsPremium] = useState(false);
+  // const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const useApiHook = useApi();
@@ -35,8 +35,8 @@ export default function RegisterScreen() {
       const response = await useApiHook.createUser({
         username,
         email,
-        password_hash: password,
-        is_premium: isPremium,
+        password: password,
+        // is_premium: isPremium,
       });
       Toast.show({
         type: "success",
@@ -80,14 +80,7 @@ export default function RegisterScreen() {
         secureTextEntry
         placeholderTextColor="#656060ff"
       />
-      <View style={styles.switchContainer}>
-        <Text style={styles.switchLabel}>Conta Premium</Text>
-        <Switch
-          value={isPremium}
-          onValueChange={setIsPremium}
-          thumbColor={isPremium ? "#ed4f27ff" : "#ccc"}
-        />
-      </View>
+
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handleRegister}
@@ -150,3 +143,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+//  <View style={styles.switchContainer}>
+//       <Text style={styles.switchLabel}>Conta Premium</Text>
+//       <Switch
+//         value={isPremium}
+//         onValueChange={setIsPremium}
+//         thumbColor={isPremium ? "#ed4f27ff" : "#ccc"}
+//       />
+//     </View>

@@ -16,8 +16,9 @@ const api = axios.create({
 
 export function useApi() {
   const getSavedRecipes = async (userId: number) => {
+    console.log("id: ", userId);
     try {
-      const response = await api.get(`/user/saved_recipes/${userId}`);
+      const response = await api.get(`/cook_ai/recipes/user/${userId}`);
       return response.data;
     } catch (error) {
       Toast.show({
@@ -31,7 +32,10 @@ export function useApi() {
 
   const saveRecipe = async (userId: number, dados: any) => {
     try {
-      const response = await api.post(`/user/save_recipe/${userId}`, dados);
+      const response = await api.post(
+        `/cook_ai/recipes/user/${userId}/save`,
+        dados
+      );
       Toast.show({
         type: "success",
         text1: "Receita salva com sucesso!",
@@ -49,7 +53,7 @@ export function useApi() {
 
   const createUser = async (dados: any) => {
     try {
-      const response = await api.post("/user/create_user", dados);
+      const response = await api.post("/auth/users/register", dados);
       Toast.show({
         type: "success",
         text1: "Usuário criado com sucesso!",
@@ -68,7 +72,7 @@ export function useApi() {
   const loginUser = async (dados: any) => {
     try {
       console.log("Logging in with data:", dados);
-      const response = await api.post("/user/login_user", dados);
+      const response = await api.post("/auth/users/login", dados);
 
       console.log("Login response:", response.data);
 
@@ -110,11 +114,26 @@ export function useApi() {
   const getUserData = async () => {
     try {
       const userData = await AsyncStorage.getItem("userData");
-      console.log("Retrieved user data:", userData);
-      // userData ? JSON.parse(userData) : null;
-      return userData ? JSON.parse(userData).user_id : null;
+
+      if (!userData) {
+        console.log("Nenhum dado de usuário encontrado no storage");
+        return null;
+      }
+
+      const userDataObject = JSON.parse(userData);
+
+      // Validar se o objeto tem as propriedades necessárias
+      if (!userDataObject || typeof userDataObject !== "object") {
+        console.log("Dados do usuário inválidos");
+        return null;
+      }
+
+      console.log("Dados do usuário recuperados:", userDataObject);
+
+      // Retornar o objeto completo em vez de apenas o ID
+      return userDataObject;
     } catch (error) {
-      console.log("Erro ao recuperar os dados do usuário:", error);
+      console.error("Erro ao recuperar os dados do usuário:", error);
       return null;
     }
   };
@@ -123,7 +142,7 @@ export function useApi() {
     try {
       console.log("Scraping URL:", url);
       const response = await api.post(
-        `/recipes/scrap?url=${encodeURIComponent(url)}`
+        `cook_ai/recipes/scrap?url=${encodeURIComponent(url)}`
       );
       Toast.show({
         type: "success",
@@ -142,7 +161,7 @@ export function useApi() {
   const searchRecipes = async (query: string) => {
     try {
       // Exemplo de chamada para uma API de receitas
-      const response = await api.post("/recipes/search", { query });
+      const response = await api.post("cook_ai/recipes/search", { query });
       return response.data;
     } catch (error) {
       console.error("Erro ao buscar receitas:", error);

@@ -14,7 +14,7 @@ import ModalLogin from "@/components/ModalLogin";
 export default function ScrapResults({ data }: { data: string }) {
   const [expanded, setExpanded] = useState(false);
   const [savedRecipes, setSavedRecipes] = useState<string[]>([]);
-  const useApiHooks = useApi();
+  const useApiHook = useApi();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { isLoggedIn } = useAuth();
   const router = useRouter();
@@ -25,8 +25,9 @@ export default function ScrapResults({ data }: { data: string }) {
       return;
     }
     try {
-      const userId = await useApiHooks.getUserData();
-      const res = await useApiHooks.saveRecipe(userId, { recipe: data });
+      const userData = await useApiHook.getUserData();
+      const userId = userData.id;
+      const res = await useApiHook.saveRecipe(userId, { content: data });
       setSavedRecipes([...savedRecipes, data]);
       Toast.show({
         type: "success",
